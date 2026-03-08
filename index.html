@@ -131,49 +131,49 @@
     const trainerEl = document.getElementById("trainer");
     const playerEl = document.getElementById("player");
 
-    const pos = {
-      p1: { top: 770, left: 82, scale: 1.18 },
-      p2: { top: 605, left: 505, scale: 1.05 },
-      p3: { top: 505, left: 108, scale: 0.96 },
-      p4: { top: 338, left: 255, scale: 0.84 },
-      p5: { top: 212, left: 448, scale: 0.73 }
-    };
+   const pos = {
+  p1: { top: 770, left: 82, scale: 1.18 },
+  p2: { top: 605, left: 505, scale: 1.05 },
+  p3: { top: 535, left: 190, scale: 0.96 },
+  p4: { top: 390, left: 315, scale: 0.84 },
+  p5: { top: 250, left: 395, scale: 0.73 }
+};
 
-    const paths = {
-      startTo2: [
-        { top: 770, left: 82, scale: 1.18 },
-        { top: 725, left: 118, scale: 1.15 },
-        { top: 690, left: 170, scale: 1.12 },
-        { top: 660, left: 245, scale: 1.10 },
-        { top: 635, left: 345, scale: 1.08 },
-        { top: 617, left: 435, scale: 1.06 },
-        { top: 605, left: 505, scale: 1.05 }
-      ],
-      p2To3: [
-        { top: 600, left: 470, scale: 1.03 },
-        { top: 590, left: 400, scale: 1.01 },
-        { top: 575, left: 315, scale: 0.99 },
-        { top: 555, left: 230, scale: 0.98 },
-        { top: 530, left: 155, scale: 0.97 },
-        { top: 505, left: 108, scale: 0.96 }
-      ],
-      p3To4: [
-        { top: 490, left: 128, scale: 0.94 },
-        { top: 465, left: 155, scale: 0.92 },
-        { top: 438, left: 185, scale: 0.90 },
-        { top: 405, left: 215, scale: 0.88 },
-        { top: 370, left: 238, scale: 0.86 },
-        { top: 338, left: 255, scale: 0.84 }
-      ],
-      p4To5: [
-        { top: 316, left: 278, scale: 0.82 },
-        { top: 290, left: 315, scale: 0.80 },
-        { top: 265, left: 355, scale: 0.78 },
-        { top: 242, left: 392, scale: 0.76 },
-        { top: 223, left: 425, scale: 0.74 },
-        { top: 212, left: 448, scale: 0.73 }
-      ]
-    };
+   const paths = {
+  startTo2: [
+    { top: 770, left: 82, scale: 1.18 },
+    { top: 725, left: 118, scale: 1.15 },
+    { top: 690, left: 170, scale: 1.12 },
+    { top: 660, left: 245, scale: 1.10 },
+    { top: 635, left: 345, scale: 1.08 },
+    { top: 617, left: 435, scale: 1.06 },
+    { top: 605, left: 505, scale: 1.05 }
+  ],
+  p2To3: [
+    { top: 610, left: 470, scale: 1.03 },
+    { top: 605, left: 410, scale: 1.01 },
+    { top: 595, left: 340, scale: 0.99 },
+    { top: 580, left: 280, scale: 0.98 },
+    { top: 560, left: 225, scale: 0.97 },
+    { top: 535, left: 190, scale: 0.96 }
+  ],
+  p3To4: [
+    { top: 520, left: 210, scale: 0.94 },
+    { top: 495, left: 235, scale: 0.92 },
+    { top: 465, left: 260, scale: 0.90 },
+    { top: 435, left: 285, scale: 0.88 },
+    { top: 410, left: 302, scale: 0.86 },
+    { top: 390, left: 315, scale: 0.84 }
+  ],
+  p4To5: [
+    { top: 375, left: 332, scale: 0.82 },
+    { top: 350, left: 350, scale: 0.80 },
+    { top: 322, left: 366, scale: 0.78 },
+    { top: 295, left: 380, scale: 0.76 },
+    { top: 270, left: 390, scale: 0.74 },
+    { top: 250, left: 395, scale: 0.73 }
+  ]
+};
 
     let stage = 0;
     let playerName = "";
