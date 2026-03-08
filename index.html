@@ -137,7 +137,25 @@
     <button onclick="resetGame()">Reset</button>
   </div>
 
-  <script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+    import { getDatabase, ref, get, onValue, update } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA5kq-HiCkVroQLCwwVc24C8XYPJTZvegM",
+      authDomain: "queue-tracker-3fa3c.firebaseapp.com",
+      databaseURL: "https://queue-tracker-3fa3c-default-rtdb.europe-west1.firebasedatabase.app/",
+      projectId: "queue-tracker-3fa3c",
+      storageBucket: "queue-tracker-3fa3c.firebasestorage.app",
+      messagingSenderId: "132132188124",
+      appId: "1:132132188124:web:ecc130f7ee7ac9d61be919",
+      measurementId: "G-3QBWJHGDXG"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const stateRef = ref(db, "streamTools/roadToGlory/state");
+
     const params = new URLSearchParams(window.location.search);
     const overlayMode = params.get("view") === "overlay";
 
@@ -202,16 +220,26 @@
       return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    function saveState() {
-      localStorage.setItem("rtg_stage", String(stage));
-      localStorage.setItem("rtg_playerName", playerName);
-      localStorage.setItem("rtg_jackpot", String(jackpot));
+    async function ensureStateExists() {
+      const snapshot = await get(stateRef);
+
+      if (!snapshot.exists()) {
+        await update(stateRef, {
+          stage: 0,
+          playerName: "",
+          jackpot: 0,
+          updatedAt: Date.now()
+        });
+      }
     }
 
-    function loadState() {
-      stage = parseInt(localStorage.getItem("rtg_stage") || "0", 10);
-      playerName = localStorage.getItem("rtg_playerName") || "";
-      jackpot = parseInt(localStorage.getItem("rtg_jackpot") || "0", 10);
+    async function saveState() {
+      await update(stateRef, {
+        stage,
+        playerName,
+        jackpot,
+        updatedAt: Date.now()
+      });
     }
 
     function renderName() {
@@ -258,16 +286,14 @@
       if (stage === 5) setTrainer(pos.p5);
     }
 
-    function addJackpot() {
+    async function addJackpot() {
       jackpot += 1;
-      saveState();
-      renderJackpot();
+      await saveState();
     }
 
-    function resetJackpot() {
+    async function resetJackpot() {
       jackpot = 0;
-      saveState();
-      renderJackpot();
+      await saveState();
     }
 
     async function challengerTakesOver() {
@@ -276,19 +302,22 @@
       const newName = prompt("Neuer Spieler Name?");
       if (!newName) return;
 
+      const cleanName = newName.trim();
+      if (!cleanName) return;
+
       isAnimating = true;
 
-      playerName = newName;
+      playerName = cleanName;
       renderName();
 
       stage = 1;
-      saveState();
+      await saveState();
       setTrainer(pos.p1);
 
       await wait(220);
 
       stage = 2;
-      saveState();
+      await saveState();
       await animatePath(paths.startTo2);
 
       isAnimating = false;
@@ -306,7 +335,7 @@
 
       if (stage === 2) {
         stage = 3;
-        saveState();
+        await saveState();
         await animatePath(paths.p2To3);
         isAnimating = false;
         return;
@@ -314,7 +343,7 @@
 
       if (stage === 3) {
         stage = 4;
-        saveState();
+        await saveState();
         await animatePath(paths.p3To4);
         isAnimating = false;
         return;
@@ -322,7 +351,7 @@
 
       if (stage === 4) {
         stage = 5;
-        saveState();
+        await saveState();
         await animatePath(paths.p4To5);
         isAnimating = false;
         return;
@@ -332,8 +361,8 @@
         await wait(140);
         alert(playerName + " gewinnt die TTB + " + jackpot + " € Champion Jackpot!");
         jackpot = 0;
-        saveState();
-        resetGame();
+        await saveState();
+        await resetGame();
         isAnimating = false;
         return;
       }
@@ -341,15 +370,32 @@
       isAnimating = false;
     }
 
-    function resetGame() {
+    async function resetGame() {
       stage = 0;
       playerName = "";
-      saveState();
+      await saveState();
       renderStaticStage();
     }
 
-    loadState();
+    onValue(stateRef, (snapshot) => {
+      const data = snapshot.val();
+      if (!data) return;
+
+      stage = Number(data.stage || 0);
+      playerName = data.playerName || "";
+      jackpot = Number(data.jackpot || 0);
+
+      renderStaticStage();
+    });
+
+    await ensureStateExists();
     renderStaticStage();
+
+    window.challengerTakesOver = challengerTakesOver;
+    window.defendRoad = defendRoad;
+    window.addJackpot = addJackpot;
+    window.resetJackpot = resetJackpot;
+    window.resetGame = resetGame;
   </script>
 
 </body>
