@@ -1,145 +1,292 @@
 <!doctype html>
 <html lang="de">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Road to Glory</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Road to Glory</title>
 
-<style>
-body{
-margin:0;
-background:transparent;
-font-family:Arial;
-color:white;
-}
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      font-family: Arial, Helvetica, sans-serif;
+      color: white;
+    }
 
-#game{
-position:relative;
-width:600px;
-}
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+    }
 
-#road{
-width:100%;
-display:block;
-}
+    #game {
+      position: relative;
+      width: 600px;
+      overflow: hidden;
+    }
 
-#trainer{
-position:absolute;
-width:80px;
-transform:translate(-50%,-50%);
-transition:all .6s ease;
-}
+    #road {
+      width: 100%;
+      display: block;
+    }
 
-#player{
-position:absolute;
-top:30px;
-left:30px;
-font-size:26px;
-font-weight:700;
-text-shadow:0 0 10px black;
-}
+    #player {
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      font-size: 34px;
+      font-weight: 800;
+      color: #fff;
+      text-shadow: 0 4px 12px rgba(0,0,0,.55);
+      z-index: 6;
+    }
 
-#panel{
-margin-top:20px;
-background:#1b1b1b;
-padding:15px;
-border-radius:10px;
-}
+    #trainer {
+      position: absolute;
+      width: 96px;
+      height: auto;
+      transform: translate(-50%, -50%) scale(1);
+      transform-origin: center center;
+      transition:
+        left .7s ease-in-out,
+        top .7s ease-in-out,
+        transform .7s ease-in-out,
+        opacity .35s ease-in-out;
+      z-index: 5;
+      image-rendering: pixelated;
+      opacity: 0;
+      pointer-events: none;
+    }
 
-button{
-padding:10px 15px;
-margin:5px;
-font-size:16px;
-cursor:pointer;
-}
-</style>
+    #panel {
+      margin-top: 18px;
+      background: rgba(20,20,20,.92);
+      padding: 14px;
+      border-radius: 12px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
 
+    button {
+      padding: 12px 18px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 0;
+      border-radius: 10px;
+      background: #f3f3f3;
+      color: #111;
+    }
+
+    button:hover {
+      filter: brightness(0.96);
+    }
+
+    .hidden-ui #panel {
+      display: none;
+    }
+  </style>
 </head>
-
 <body>
 
-<div id="game">
+  <div id="game">
+    <img id="road" src="road.png" alt="Road to Glory">
+    <div id="player">Kein Spieler</div>
+    <img id="trainer" src="trainer.png" alt="Trainer">
+  </div>
 
-<img id="road" src="road.png">
+  <div id="panel">
+    <button onclick="challengerTakesOver()">Herausforderer übernimmt</button>
+    <button onclick="defendRoad()">Road verteidigt</button>
+    <button onclick="resetGame()">Reset</button>
+  </div>
 
-<div id="player">Kein Spieler</div>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const overlayMode = params.get("view") === "overlay";
 
-<img id="trainer" src="trainer.png">
+    if (overlayMode) {
+      document.body.classList.add("hidden-ui");
+    }
 
-</div>
+    const trainerEl = document.getElementById("trainer");
+    const playerEl = document.getElementById("player");
 
-<div id="panel">
+    const pos = {
+      p1: { top: 760, left: 88, scale: 1.18 },
+      p2: { top: 610, left: 520, scale: 1.05 },
+      p3: { top: 500, left: 120, scale: 0.95 },
+      p4: { top: 330, left: 300, scale: 0.84 },
+      p5: { top: 205, left: 470, scale: 0.72 }
+    };
 
-<button onclick="newChallenger()">Herausforderer übernimmt</button>
-<button onclick="defend()">Road verteidigt</button>
-<button onclick="resetGame()">Reset</button>
+    const paths = {
+      startTo2: [
+        { top: 760, left: 88, scale: 1.18 },
+        { top: 710, left: 150, scale: 1.15 },
+        { top: 680, left: 230, scale: 1.12 },
+        { top: 650, left: 330, scale: 1.09 },
+        { top: 630, left: 430, scale: 1.07 },
+        { top: 610, left: 520, scale: 1.05 }
+      ],
+      p2To3: [
+        { top: 600, left: 490, scale: 1.03 },
+        { top: 585, left: 430, scale: 1.01 },
+        { top: 565, left: 350, scale: 0.99 },
+        { top: 545, left: 260, scale: 0.97 },
+        { top: 520, left: 180, scale: 0.96 },
+        { top: 500, left: 120, scale: 0.95 }
+      ],
+      p3To4: [
+        { top: 485, left: 150, scale: 0.93 },
+        { top: 460, left: 190, scale: 0.91 },
+        { top: 430, left: 225, scale: 0.89 },
+        { top: 395, left: 255, scale: 0.87 },
+        { top: 360, left: 280, scale: 0.85 },
+        { top: 330, left: 300, scale: 0.84 }
+      ],
+      p4To5: [
+        { top: 310, left: 320, scale: 0.82 },
+        { top: 285, left: 355, scale: 0.80 },
+        { top: 260, left: 395, scale: 0.78 },
+        { top: 235, left: 430, scale: 0.76 },
+        { top: 218, left: 455, scale: 0.74 },
+        { top: 205, left: 470, scale: 0.72 }
+      ]
+    };
 
-</div>
+    let stage = 0;
+    let playerName = "";
+    let isAnimating = false;
 
-<script>
+    function wait(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
-let wins = 0
-let name = ""
+    function saveState() {
+      localStorage.setItem("rtg_stage", String(stage));
+      localStorage.setItem("rtg_playerName", playerName);
+    }
 
-const pos = [
-{top:760,left:80},   // Start / 1
-{top:610,left:360},  // 2
-{top:500,left:120},  // 3
-{top:330,left:270},  // 4
-{top:200,left:350}   // 5
-]
+    function loadState() {
+      stage = parseInt(localStorage.getItem("rtg_stage") || "0", 10);
+      playerName = localStorage.getItem("rtg_playerName") || "";
+    }
 
-function move(){
-document.getElementById("trainer").style.top = pos[wins].top+"px"
-document.getElementById("trainer").style.left = pos[wins].left+"px"
-}
+    function renderName() {
+      playerEl.textContent = playerName || "Kein Spieler";
+    }
 
-function newChallenger(){
+    function setTrainer(point) {
+      trainerEl.style.left = point.left + "px";
+      trainerEl.style.top = point.top + "px";
+      trainerEl.style.transform = `translate(-50%, -50%) scale(${point.scale})`;
+      trainerEl.style.opacity = "1";
+    }
 
-name = prompt("Neuer Spieler Name")
+    async function animatePath(points, stepDelay = 320) {
+      for (const point of points) {
+        setTrainer(point);
+        await wait(stepDelay);
+      }
+    }
 
-if(!name) return
+    function hideTrainer() {
+      trainerEl.style.opacity = "0";
+      trainerEl.style.left = "-200px";
+      trainerEl.style.top = "-200px";
+    }
 
-document.getElementById("player").innerText = name
+    function renderStaticStage() {
+      renderName();
 
-wins = 0
-move()
+      if (!playerName || stage === 0) {
+        hideTrainer();
+        return;
+      }
 
-setTimeout(()=>{
-wins = 1
-move()
-},500)
+      if (stage === 2) setTrainer(pos.p2);
+      if (stage === 3) setTrainer(pos.p3);
+      if (stage === 4) setTrainer(pos.p4);
+      if (stage === 5) setTrainer(pos.p5);
+    }
 
-}
+    async function challengerTakesOver() {
+      if (isAnimating) return;
 
-function defend(){
+      const newName = prompt("Neuer Spieler Name?");
+      if (!newName) return;
 
-wins++
+      isAnimating = true;
+      playerName = newName;
+      renderName();
 
-if(wins>4){
-alert(name+" gewinnt die TTB!")
-resetGame()
-return
-}
+      stage = 1;
+      saveState();
+      setTrainer(pos.p1);
 
-move()
+      await wait(260);
 
-}
+      stage = 2;
+      saveState();
+      await animatePath(paths.startTo2);
 
-function resetGame(){
+      isAnimating = false;
+    }
 
-wins=0
-name=""
+    async function defendRoad() {
+      if (isAnimating) return;
 
-document.getElementById("player").innerText="Kein Spieler"
+      if (!playerName || stage === 0) {
+        alert("Es ist noch kein Spieler auf der Road.");
+        return;
+      }
 
-move()
+      isAnimating = true;
 
-}
+      if (stage === 2) {
+        stage = 3;
+        saveState();
+        await animatePath(paths.p2To3);
+        isAnimating = false;
+        return;
+      }
 
-move()
+      if (stage === 3) {
+        stage = 4;
+        saveState();
+        await animatePath(paths.p3To4);
+        isAnimating = false;
+        return;
+      }
 
-</script>
+      if (stage === 4) {
+        stage = 5;
+        saveState();
+        await animatePath(paths.p4To5);
+        await wait(180);
+        alert(playerName + " gewinnt die TTB!");
+        resetGame();
+        isAnimating = false;
+        return;
+      }
+
+      isAnimating = false;
+    }
+
+    function resetGame() {
+      stage = 0;
+      playerName = "";
+      saveState();
+      renderStaticStage();
+    }
+
+    loadState();
+    renderStaticStage();
+  </script>
 
 </body>
 </html>
