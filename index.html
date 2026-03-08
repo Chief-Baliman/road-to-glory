@@ -58,6 +58,20 @@
       word-break: break-word;
     }
 
+    #jackpot {
+      position: absolute;
+      top: 126px;
+      left: 30px;
+      font-size: 24px;
+      font-weight: 800;
+      color: #e9a846;
+      text-shadow: 0 4px 12px rgba(0,0,0,.55);
+      z-index: 7;
+      line-height: 1.1;
+      max-width: 360px;
+      word-break: break-word;
+    }
+
     #trainer {
       position: absolute;
       width: 112px;
@@ -111,12 +125,15 @@
     <img id="road" src="road.png" alt="Road to Glory">
     <div id="title">Road to Glory</div>
     <div id="player">Kein Spieler</div>
+    <div id="jackpot">Champion Jackpot: 0 €</div>
     <img id="trainer" src="trainer.png" alt="Trainer">
   </div>
 
   <div id="panel">
     <button onclick="challengerTakesOver()">Herausforderer übernimmt</button>
     <button onclick="defendRoad()">Road verteidigt</button>
+    <button onclick="addJackpot()">Jackpot +1 €</button>
+    <button onclick="resetJackpot()">Jackpot Reset</button>
     <button onclick="resetGame()">Reset</button>
   </div>
 
@@ -130,53 +147,55 @@
 
     const trainerEl = document.getElementById("trainer");
     const playerEl = document.getElementById("player");
+    const jackpotEl = document.getElementById("jackpot");
 
-   const pos = {
-  p1: { top: 770, left: 82, scale: 1.18 },
-  p2: { top: 605, left: 505, scale: 1.05 },
-  p3: { top: 535, left: 190, scale: 0.96 },
-  p4: { top: 390, left: 315, scale: 0.84 },
-  p5: { top: 250, left: 395, scale: 0.73 }
-};
+    const pos = {
+      p1: { top: 770, left: 82, scale: 1.18 },
+      p2: { top: 605, left: 505, scale: 1.05 },
+      p3: { top: 535, left: 190, scale: 0.96 },
+      p4: { top: 390, left: 315, scale: 0.84 },
+      p5: { top: 250, left: 395, scale: 0.73 }
+    };
 
-   const paths = {
-  startTo2: [
-    { top: 770, left: 82, scale: 1.18 },
-    { top: 725, left: 118, scale: 1.15 },
-    { top: 690, left: 170, scale: 1.12 },
-    { top: 660, left: 245, scale: 1.10 },
-    { top: 635, left: 345, scale: 1.08 },
-    { top: 617, left: 435, scale: 1.06 },
-    { top: 605, left: 505, scale: 1.05 }
-  ],
-  p2To3: [
-    { top: 610, left: 470, scale: 1.03 },
-    { top: 605, left: 410, scale: 1.01 },
-    { top: 595, left: 340, scale: 0.99 },
-    { top: 580, left: 280, scale: 0.98 },
-    { top: 560, left: 225, scale: 0.97 },
-    { top: 535, left: 190, scale: 0.96 }
-  ],
-  p3To4: [
-    { top: 520, left: 210, scale: 0.94 },
-    { top: 495, left: 235, scale: 0.92 },
-    { top: 465, left: 260, scale: 0.90 },
-    { top: 435, left: 285, scale: 0.88 },
-    { top: 410, left: 302, scale: 0.86 },
-    { top: 390, left: 315, scale: 0.84 }
-  ],
-  p4To5: [
-    { top: 375, left: 332, scale: 0.82 },
-    { top: 350, left: 350, scale: 0.80 },
-    { top: 322, left: 366, scale: 0.78 },
-    { top: 295, left: 380, scale: 0.76 },
-    { top: 270, left: 390, scale: 0.74 },
-    { top: 250, left: 395, scale: 0.73 }
-  ]
-};
+    const paths = {
+      startTo2: [
+        { top: 770, left: 82, scale: 1.18 },
+        { top: 725, left: 118, scale: 1.15 },
+        { top: 690, left: 170, scale: 1.12 },
+        { top: 660, left: 245, scale: 1.10 },
+        { top: 635, left: 345, scale: 1.08 },
+        { top: 617, left: 435, scale: 1.06 },
+        { top: 605, left: 505, scale: 1.05 }
+      ],
+      p2To3: [
+        { top: 610, left: 470, scale: 1.03 },
+        { top: 605, left: 410, scale: 1.01 },
+        { top: 595, left: 340, scale: 0.99 },
+        { top: 580, left: 280, scale: 0.98 },
+        { top: 560, left: 225, scale: 0.97 },
+        { top: 535, left: 190, scale: 0.96 }
+      ],
+      p3To4: [
+        { top: 520, left: 210, scale: 0.94 },
+        { top: 495, left: 235, scale: 0.92 },
+        { top: 465, left: 260, scale: 0.90 },
+        { top: 435, left: 285, scale: 0.88 },
+        { top: 410, left: 302, scale: 0.86 },
+        { top: 390, left: 315, scale: 0.84 }
+      ],
+      p4To5: [
+        { top: 375, left: 332, scale: 0.82 },
+        { top: 350, left: 350, scale: 0.80 },
+        { top: 322, left: 366, scale: 0.78 },
+        { top: 295, left: 380, scale: 0.76 },
+        { top: 270, left: 390, scale: 0.74 },
+        { top: 250, left: 395, scale: 0.73 }
+      ]
+    };
 
     let stage = 0;
     let playerName = "";
+    let jackpot = 0;
     let isAnimating = false;
 
     function wait(ms) {
@@ -186,15 +205,21 @@
     function saveState() {
       localStorage.setItem("rtg_stage", String(stage));
       localStorage.setItem("rtg_playerName", playerName);
+      localStorage.setItem("rtg_jackpot", String(jackpot));
     }
 
     function loadState() {
       stage = parseInt(localStorage.getItem("rtg_stage") || "0", 10);
       playerName = localStorage.getItem("rtg_playerName") || "";
+      jackpot = parseInt(localStorage.getItem("rtg_jackpot") || "0", 10);
     }
 
     function renderName() {
       playerEl.textContent = playerName || "Kein Spieler";
+    }
+
+    function renderJackpot() {
+      jackpotEl.textContent = "Champion Jackpot: " + jackpot + " €";
     }
 
     function setTrainer(point) {
@@ -219,6 +244,7 @@
 
     function renderStaticStage() {
       renderName();
+      renderJackpot();
 
       if (!playerName || stage === 0) {
         hideTrainer();
@@ -230,6 +256,18 @@
       if (stage === 3) setTrainer(pos.p3);
       if (stage === 4) setTrainer(pos.p4);
       if (stage === 5) setTrainer(pos.p5);
+    }
+
+    function addJackpot() {
+      jackpot += 1;
+      saveState();
+      renderJackpot();
+    }
+
+    function resetJackpot() {
+      jackpot = 0;
+      saveState();
+      renderJackpot();
     }
 
     async function challengerTakesOver() {
@@ -292,7 +330,9 @@
 
       if (stage === 5) {
         await wait(140);
-        alert(playerName + " gewinnt die TTB!");
+        alert(playerName + " gewinnt die TTB + " + jackpot + " € Champion Jackpot!");
+        jackpot = 0;
+        saveState();
         resetGame();
         isAnimating = false;
         return;
