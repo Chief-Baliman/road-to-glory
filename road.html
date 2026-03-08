@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Road to Glory</title>
+
+<style>
+body{
+margin:0;
+background:transparent;
+font-family:Arial;
+color:white;
+}
+
+#game{
+position:relative;
+width:600px;
+}
+
+#road{
+width:100%;
+display:block;
+}
+
+#trainer{
+position:absolute;
+width:60px;
+transition:all .6s ease;
+}
+
+#player{
+position:absolute;
+top:30px;
+left:30px;
+font-size:26px;
+font-weight:700;
+text-shadow:0 0 10px black;
+}
+
+#panel{
+margin-top:20px;
+background:#1b1b1b;
+padding:15px;
+border-radius:10px;
+}
+
+button{
+padding:10px 15px;
+margin:5px;
+font-size:16px;
+cursor:pointer;
+}
+</style>
+
+</head>
+
+<body>
+
+<div id="game">
+
+<img id="road" src="road.png">
+
+<div id="player">Kein Spieler</div>
+
+<img id="trainer" src="trainer.png">
+
+</div>
+
+<div id="panel">
+
+<button onclick="newChallenger()">Herausforderer übernimmt</button>
+<button onclick="defend()">Road verteidigt</button>
+<button onclick="resetGame()">Reset</button>
+
+</div>
+
+<script>
+
+let wins = 0
+let name = ""
+
+const pos = [
+{top:540,left:60},   // start
+{top:480,left:160},  // 2
+{top:350,left:90},   // 3
+{top:250,left:200},  // 4
+{top:150,left:260}   // 5
+]
+
+function move(){
+document.getElementById("trainer").style.top = pos[wins].top+"px"
+document.getElementById("trainer").style.left = pos[wins].left+"px"
+}
+
+function newChallenger(){
+
+name = prompt("Neuer Spieler Name")
+
+if(!name) return
+
+document.getElementById("player").innerText = name
+
+wins = 0
+move()
+
+setTimeout(()=>{
+wins = 1
+move()
+},500)
+
+}
+
+function defend(){
+
+wins++
+
+if(wins>4){
+alert(name+" gewinnt die TTB!")
+resetGame()
+return
+}
+
+move()
+
+}
+
+function resetGame(){
+
+wins=0
+name=""
+
+document.getElementById("player").innerText="Kein Spieler"
+
+move()
+
+}
+
+move()
+
+</script>
+
+</body>
+</html>
