@@ -32,29 +32,44 @@
       display: block;
     }
 
+    #title {
+      position: absolute;
+      top: 26px;
+      left: 30px;
+      font-size: 42px;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 4px 14px rgba(0,0,0,.55);
+      z-index: 7;
+      line-height: 1;
+    }
+
     #player {
       position: absolute;
-      top: 30px;
+      top: 84px;
       left: 30px;
-      font-size: 34px;
+      font-size: 30px;
       font-weight: 800;
       color: #fff;
       text-shadow: 0 4px 12px rgba(0,0,0,.55);
-      z-index: 6;
+      z-index: 7;
+      line-height: 1.1;
+      max-width: 360px;
+      word-break: break-word;
     }
 
     #trainer {
       position: absolute;
-      width: 96px;
+      width: 112px;
       height: auto;
       transform: translate(-50%, -50%) scale(1);
       transform-origin: center center;
       transition:
-        left .7s ease-in-out,
-        top .7s ease-in-out,
-        transform .7s ease-in-out,
-        opacity .35s ease-in-out;
-      z-index: 5;
+        left .28s linear,
+        top .28s linear,
+        transform .28s linear,
+        opacity .25s ease-in-out;
+      z-index: 6;
       image-rendering: pixelated;
       opacity: 0;
       pointer-events: none;
@@ -94,6 +109,7 @@
 
   <div id="game">
     <img id="road" src="road.png" alt="Road to Glory">
+    <div id="title">Road to Glory</div>
     <div id="player">Kein Spieler</div>
     <img id="trainer" src="trainer.png" alt="Trainer">
   </div>
@@ -116,45 +132,46 @@
     const playerEl = document.getElementById("player");
 
     const pos = {
-      p1: { top: 760, left: 88, scale: 1.18 },
-      p2: { top: 610, left: 520, scale: 1.05 },
-      p3: { top: 500, left: 120, scale: 0.95 },
-      p4: { top: 330, left: 300, scale: 0.84 },
-      p5: { top: 205, left: 470, scale: 0.72 }
+      p1: { top: 770, left: 82, scale: 1.18 },
+      p2: { top: 605, left: 505, scale: 1.05 },
+      p3: { top: 505, left: 108, scale: 0.96 },
+      p4: { top: 338, left: 255, scale: 0.84 },
+      p5: { top: 212, left: 448, scale: 0.73 }
     };
 
     const paths = {
       startTo2: [
-        { top: 760, left: 88, scale: 1.18 },
-        { top: 710, left: 150, scale: 1.15 },
-        { top: 680, left: 230, scale: 1.12 },
-        { top: 650, left: 330, scale: 1.09 },
-        { top: 630, left: 430, scale: 1.07 },
-        { top: 610, left: 520, scale: 1.05 }
+        { top: 770, left: 82, scale: 1.18 },
+        { top: 725, left: 118, scale: 1.15 },
+        { top: 690, left: 170, scale: 1.12 },
+        { top: 660, left: 245, scale: 1.10 },
+        { top: 635, left: 345, scale: 1.08 },
+        { top: 617, left: 435, scale: 1.06 },
+        { top: 605, left: 505, scale: 1.05 }
       ],
       p2To3: [
-        { top: 600, left: 490, scale: 1.03 },
-        { top: 585, left: 430, scale: 1.01 },
-        { top: 565, left: 350, scale: 0.99 },
-        { top: 545, left: 260, scale: 0.97 },
-        { top: 520, left: 180, scale: 0.96 },
-        { top: 500, left: 120, scale: 0.95 }
+        { top: 600, left: 470, scale: 1.03 },
+        { top: 590, left: 400, scale: 1.01 },
+        { top: 575, left: 315, scale: 0.99 },
+        { top: 555, left: 230, scale: 0.98 },
+        { top: 530, left: 155, scale: 0.97 },
+        { top: 505, left: 108, scale: 0.96 }
       ],
       p3To4: [
-        { top: 485, left: 150, scale: 0.93 },
-        { top: 460, left: 190, scale: 0.91 },
-        { top: 430, left: 225, scale: 0.89 },
-        { top: 395, left: 255, scale: 0.87 },
-        { top: 360, left: 280, scale: 0.85 },
-        { top: 330, left: 300, scale: 0.84 }
+        { top: 490, left: 128, scale: 0.94 },
+        { top: 465, left: 155, scale: 0.92 },
+        { top: 438, left: 185, scale: 0.90 },
+        { top: 405, left: 215, scale: 0.88 },
+        { top: 370, left: 238, scale: 0.86 },
+        { top: 338, left: 255, scale: 0.84 }
       ],
       p4To5: [
-        { top: 310, left: 320, scale: 0.82 },
-        { top: 285, left: 355, scale: 0.80 },
-        { top: 260, left: 395, scale: 0.78 },
-        { top: 235, left: 430, scale: 0.76 },
-        { top: 218, left: 455, scale: 0.74 },
-        { top: 205, left: 470, scale: 0.72 }
+        { top: 316, left: 278, scale: 0.82 },
+        { top: 290, left: 315, scale: 0.80 },
+        { top: 265, left: 355, scale: 0.78 },
+        { top: 242, left: 392, scale: 0.76 },
+        { top: 223, left: 425, scale: 0.74 },
+        { top: 212, left: 448, scale: 0.73 }
       ]
     };
 
@@ -187,7 +204,7 @@
       trainerEl.style.opacity = "1";
     }
 
-    async function animatePath(points, stepDelay = 320) {
+    async function animatePath(points, stepDelay = 180) {
       for (const point of points) {
         setTrainer(point);
         await wait(stepDelay);
@@ -208,6 +225,7 @@
         return;
       }
 
+      if (stage === 1) setTrainer(pos.p1);
       if (stage === 2) setTrainer(pos.p2);
       if (stage === 3) setTrainer(pos.p3);
       if (stage === 4) setTrainer(pos.p4);
@@ -221,6 +239,7 @@
       if (!newName) return;
 
       isAnimating = true;
+
       playerName = newName;
       renderName();
 
@@ -228,7 +247,7 @@
       saveState();
       setTrainer(pos.p1);
 
-      await wait(260);
+      await wait(220);
 
       stage = 2;
       saveState();
@@ -267,7 +286,12 @@
         stage = 5;
         saveState();
         await animatePath(paths.p4To5);
-        await wait(180);
+        isAnimating = false;
+        return;
+      }
+
+      if (stage === 5) {
+        await wait(140);
         alert(playerName + " gewinnt die TTB!");
         resetGame();
         isAnimating = false;
